@@ -1,0 +1,29 @@
+{
+  "name": "generator-express-rest-dependency-injector",
+  "version": "0.0.0",
+  "description": "yeoman generator for a restful service using express, express-dependency-injector, di.js, and cluster-service",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trwalker/generator-express-rest-dependency-injector.git"
+  },
+  "keywords": [
+    "yeoman-generator",
+    "express",
+    "di",
+    "dependency",
+    "injection",
+    "rest"
+  ],
+  "author": "Tim Walker <tim.r.walker@gmail.com> (https://twitter.com/tim_walker)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/trwalker/generator-express-rest-dependency-injector/issues"
+  },
+  "homepage": "https://github.com/trwalker/generator-express-rest-dependency-injector",
+  "dependencies": {
+    "yeoman-generator": "^0.17.3"
+  }
+}
