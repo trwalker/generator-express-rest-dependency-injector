@@ -1,13 +1,19 @@
 var yeoman = require('yeoman-generator');
 
-module.exports = yeoman.generators.Base.extend({
+var input = {};
+var questions = [];
 
+var appNameQuestion = {
+  type    : 'input',
+  name    : 'name',
+  message : 'Your project name',
+  default : this.appname
+};
+
+var appGenerator = {
   initializing: {
-    method1: function () {
-      console.log('method 1 just ran');
-    },
-    method2: function () {
-      console.log('method 2 just ran');
+    initTask: function () {
+      questions.push(appNameQuestion);
     }
   },
 
@@ -15,17 +21,12 @@ module.exports = yeoman.generators.Base.extend({
     promptTask: function () {
       var done = this.async();
 
-      this.prompt({
-        type    : 'input',
-        name    : 'name',
-        message : 'Your project name',
-        default : this.appname // Default to current folder name
-      },
-      function (answers) {
-        this.log(answers.name);
+      var handleAnswers = function(answers) {
+        input.name = answers.name;
         done();
-      }
-      .bind(this));
+      };
+
+      this.prompt(questions, handleAnswers.bind(this));
     }
   },
 
@@ -52,4 +53,6 @@ module.exports = yeoman.generators.Base.extend({
   end: {
 
   }
-});
+};
+
+module.exports = yeoman.generators.Base.extend(appGenerator);
