@@ -1,58 +1,68 @@
-var yeoman = require('yeoman-generator');
+var appGenerator = (function() {
 
-var input = {};
-var questions = [];
+  var questions = [];
 
-var appNameQuestion = {
-  type    : 'input',
-  name    : 'name',
-  message : 'Your project name',
-  default : this.appname
-};
-
-var appGenerator = {
-  initializing: {
-    initTask: function () {
-      questions.push(appNameQuestion);
+  var initializingStep = {
+    initQuestions: function () {
+      questions.push({ type    : 'input',
+                       name    : 'appName',
+                       message : 'Your project name',
+                       default : this.appname });
     }
-  },
+  };
 
-  prompting: {
+  var promptingStep = {
     promptTask: function () {
       var done = this.async();
 
       var handleAnswers = function(answers) {
-        input.name = answers.name;
+        this.appName = answers.appName;
         done();
       };
 
       this.prompt(questions, handleAnswers.bind(this));
     }
-  },
+  };
 
-  configuring: {
+  var configuringStep = {
+    installDependenciesTask: function() {
+      var done = this.async();
+      this.npmInstall(['express', 'cluster-service', 'body-parser', 'express-dependency-injector'], { 'save': true }, done);
+    },
+    installDevDependenciesTask: function() {
+      var done = this.async();
+      this.npmInstall(['mocha', 'chai', 'sinon'], { 'saveDev': true }, done);
+    }
+  };
 
-  },
+  var defaultStep = {
+  };
 
-  default: {
+  var writingStep = {
+  };
 
-  },
+  var conflictsStep = {
+  };
 
-  writing: {
+  var installStep = {
+  };
 
-  },
+  var endStep = {
+  };
 
-  conflicts: {
+  return {
+    initializing: initializingStep,
+    prompting: promptingStep,
+    configuring: configuringStep,
+    default: defaultStep,
+    writing: writingStep,
+    conflicts: conflictsStep,
+    install: installStep,
+    end: endStep
+  };
 
-  },
+})();
 
-  install: {
-
-  },
-
-  end: {
-
-  }
-};
+var yeoman = require('yeoman-generator');
 
 module.exports = yeoman.generators.Base.extend(appGenerator);

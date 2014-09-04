@@ -1,68 +1,67 @@
-var yeoman = require('yeoman-generator');
+var controllerGenerator = (function() {
 
-var input = {};
-var questions = [];
+  var questions = [];
 
-var controllerFolderQuestion = {
-  type    : 'input',
-  name    : 'controllerFolder',
-  message : 'Controller Folder',
-  default : 'controllers'
-};
+  var initializingStep = {
+    initQuestions: function () {
+      questions.push({ type    : 'input',
+                       name    : 'controllerFolder',
+                       message : 'Controller Folder',
+                       default : 'controllers' });
 
-var controllerNameQuestion = {
-  type    : 'input',
-  name    : 'controllerName',
-  message : 'Controller Name',
-  default : 'newcontroller'
-};
-
-var controllerGenerator = {
-  initializing: {
-    initTask: function () {
-      questions.push(controllerFolderQuestion);
-      questions.push(controllerNameQuestion);
+      questions.push({ type    : 'input',
+                       name    : 'controllerName',
+                       message : 'Controller Name (omit "Controller" postfix)',
+                       default : 'Home' });
     }
-  },
+  };
 
-  prompting: {
+  var promptingStep = {
     promptTask: function () {
       var done = this.async();
 
       var handleAnswers = function(answers) {
-        input.controllerFolder = answers.controllerFolder;
-        input.controllerName = answers.controllerName;
+        this.controllerFolder = answers.controllerFolder.toLowerCase();
+        this.controllerName = this._.classify(answers.controllerName);
 
         done();
       };
 
       this.prompt(questions, handleAnswers.bind(this));
     }
-  },
+  };
 
-  configuring: {
-
-  },
-
-  default: {
-
-  },
-
-  writing: {
-
-  },
-
-  conflicts: {
-
-  },
-
-  install: {
-
-  },
-
-  end: {
-
+  var configuringStep = {
   }
-};
+
+  var defaultStep = {
+  };
+
+  var writingStep = {
+  };
+
+  var conflictsStep = {
+  };
+
+  var installStep = {
+  };
+
+  var endStep = {
+  };
+
+  return {
+    initializing: initializingStep,
+    prompting: promptingStep,
+    configuring: configuringStep,
+    default: defaultStep,
+    writing: writingStep,
+    conflicts: conflictsStep,
+    install: installStep,
+    end: endStep
+  };
+
+})();
+
+var yeoman = require('yeoman-generator');
 
 module.exports = yeoman.generators.Base.extend(controllerGenerator);

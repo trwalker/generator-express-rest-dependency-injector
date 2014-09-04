@@ -25,5 +25,10 @@
   "homepage": "https://github.com/trwalker/generator-express-rest-dependency-injector",
   "dependencies": {
     "yeoman-generator": "^0.17.3"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.21.4",
+    "sinon": "^1.10.3"
   }
 }
