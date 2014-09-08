@@ -39,6 +39,13 @@ var appGenerator = (function() {
   };
 
   var writingStep = {
+    writeRootFilesTask: function() {
+
+    },
+    writeConfigFilesTask: function() {
+
+    },
+    
   };
 
   var conflictsStep = {
