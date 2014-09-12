@@ -1,0 +1,9 @@
+{
+  "repositories": [
+  ],
+  "services": [
+  ],
+  "controllers": [
+    { "item": "../controllers/v1/homecontroller", "dependencies": [], "scope": "webrequest" }
+  ]
+}
