@@ -1,6 +1,6 @@
 {
   "name": "generator-express-rest-dependency-injector",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "yeoman generator for a restful service using express, express-dependency-injector, di.js, and cluster-service",
   "scripts": {
     "test": "test"
@@ -10,7 +10,10 @@
     "url": "https://github.com/trwalker/generator-express-rest-dependency-injector.git"
   },
   "keywords": [
-    "yeoman-generator",
+    "yo",
+    "yeoman",
+    "yeoman",
+    "generator",
     "express",
     "di",
     "dependency",

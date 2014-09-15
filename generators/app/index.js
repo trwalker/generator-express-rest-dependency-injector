@@ -63,13 +63,6 @@ module.exports = yeoman.generators.Base.extend({
   },
 
   configuringStep: function() {
-
-    console.log('applicationName: ' + this.applicationName);
-    console.log('version: ' + this.version);
-    console.log('applicationDescription: ' + this.applicationDescription);
-    console.log('gitRepository: ' + this.gitRepository);
-    console.log('license: ' + this.license);
-
     copyTemplate(this, '_package.json', 'package.json');
   },
 
