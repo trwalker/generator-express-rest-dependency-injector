@@ -7,8 +7,9 @@ module.exports = yeoman.generators.Base.extend({
     this.controllerName = 'Users';
     this.controllerVersion = 'v1';
     this.controllerFolderPath = 'users';
-    this.controllerRoute = '/users/:userid'
+    this.controllerRoute = '/users/:userid';
     this.controllerMethod = 'GET';
+    this.httpMethods = [ 'GET', 'PUT', 'POST', 'DELETE' ];
   },
 
   promptingStep: function() {
@@ -32,10 +33,11 @@ module.exports = yeoman.generators.Base.extend({
                           message : 'Controller Route (HTTP request route without the version)',
                           default :  this.controllerRoute });
 
-    this.questions.push({ type    : 'input',
+    this.questions.push({ type    : 'list',
                           name    : 'controllerMethod',
-                          message : 'Controller Method (GET, PUT, POST, DELETE)',
-                          default :  this.controllerMethod });
+                          message : 'Controller Method',
+                          choices : this.httpMethods,
+                          default : 0 });
 
     var done = this.async();
 
@@ -46,7 +48,7 @@ module.exports = yeoman.generators.Base.extend({
       generator.controllerVersion = answers.controllerVersion;
       generator.controllerFolderPath = answers.controllerFolderPath.toLowerCase();
       generator.controllerRoute = answers.controllerRoute.toLowerCase();
-      generator.controllerMethod = answers.controllerMethod.toUpperCase();
+      generator.controllerMethod = answers.controllerMethod;
 
       done();
     };
@@ -61,40 +63,10 @@ module.exports = yeoman.generators.Base.extend({
   },
 
   writingStep: function() {
-    var controllerDestination = this.destinationRoot() +
-                                '/lib/controllers/' +
-                                this.controllerVersion +
-                                '/' +
-                                this.controllerFolderPath +
-                                '/' +
-                                this.controllerName.toLowerCase() +
-                                'controller.js';
-
-    copyTemplate(this, 'lib/controllers/_controller.js', controllerDestination);
-
-    var routeConfigPath = this.destinationRoot() + '/lib/config/route.config.json';
-    var routeConfig = require(routeConfigPath);
-
-    if(routeConfig && routeConfig.routes) {
-      var controllerRoute = '/' +
-                            this.controllerVersion +
-                            this.controllerRoute;
-
-      var controllerLocation = '../controllers/' +
-                               this.controllerVersion +
-                               '/' +
-                               this.controllerFolderPath +
-                               '/' +
-                               this.controllerName.toLowerCase() +
-                               'controller';
-
-      routeConfig.routes.push({ route: controllerRoute, method: this.controllerMethod, controller: controllerLocation });
-
-      fs.writeFileSync(routeConfigPath, JSON.stringify(routeConfig, null, 2));
-    }
-    else {
-      throw 'Badly formatted "' + routeConfigPath + '"';
-    }
+    copyController(this);
+    copyControllerTest(this);
+    updateRouteConfig(this);
+    updateDiConfig(this);
   },
 
   conflictsStep: function() {
@@ -106,6 +78,95 @@ module.exports = yeoman.generators.Base.extend({
   endStep: function() {
   }
 });
+
+var copyController = function(generator) {
+  var controllerDestination = generator.destinationRoot() +
+                              '/lib/controllers/' +
+                              generator.controllerVersion +
+                              '/' +
+                              generator.controllerFolderPath +
+                              '/' +
+                              generator.controllerName.toLowerCase() +
+                              'controller.js';
+
+  copyTemplate(generator, 'lib/controllers/_controller.js', controllerDestination);
+};
+
+var copyControllerTest = function(generator) {
+  var controllerTestDestination = generator.destinationRoot() +
+                                  '/test/spec/' +
+                                  generator.controllerVersion +
+                                  '/' +
+                                  generator.controllerFolderPath +
+                                  '/' +
+                                  generator.controllerName.toLowerCase() +
+                                  'controller.tests.js';
+
+  copyTemplate(generator, 'test/spec/_controller.tests.js', controllerTestDestination);
+};
+
+var updateRouteConfig = function(generator) {
+
+  var routeConfigPath = generator.destinationRoot() + '/lib/config/route.config.json';
+
+  try {
+    var routeConfig = require(routeConfigPath);
+
+    if (routeConfig && routeConfig.routes) {
+      var controllerRoute = '/' +
+                            generator.controllerVersion +
+                            generator.controllerRoute;
+
+      var controllerRequirePath = getControllerRequirePath(generator);
+
+      routeConfig.routes.push({ route: controllerRoute,
+                                method: generator.controllerMethod,
+                                controller: controllerRequirePath });
+
+      fs.writeFileSync(routeConfigPath, JSON.stringify(routeConfig, null, 2));
+    }
+    else {
+      throw 'Badly formatted route config "' + routeConfigPath + '", routes array is not defined';
+    }
+  }
+  catch (e) {
+    throw 'Error parsing and updating route config "' + routeConfigPath + '":' + e;
+  }
+};
+
+var updateDiConfig = function(generator) {
+  var diConfigPath = generator.destinationRoot() + '/lib/config/di.config.json';
+
+  try {
+    var diConfig = require(diConfigPath);
+
+    if (diConfig.controllers) {
+      var controllerRequirePath = getControllerRequirePath(generator);
+
+      diConfig.controllers.push({ item: controllerRequirePath,
+                                  dependencies: [],
+                                  scope: 'webrequest' });
+
+      fs.writeFileSync(diConfigPath, JSON.stringify(diConfig, null, 2));
+    }
+    else {
+      throw 'Badly formatted di config "' + diConfigPath + '", controllers array is not defined';
+    }
+  }
+  catch (e) {
+    throw 'Error parsing and updating di config "' + diConfigPath + '":' + e;
+  }
+};
+
+var getControllerRequirePath = function(generator) {
+  return '../controllers/' +
+         generator.controllerVersion +
+         '/' +
+         generator.controllerFolderPath +
+         '/' +
+         generator.controllerName.toLowerCase() +
+         'controller';
+};
 
 var copyTemplate = function(generator, template, path) {
   if(fs.existsSync(path)) {
